@@ -1,3 +1,10 @@
+enum ValoresSistema {
+  FILAS = 50,
+  COLUMNAS = 80,
+  PROBABILIDAD_VIDA_INICIAL = 0.8,
+  LIMITE_EDAD = 50,
+}
+
 interface NodoInterface {
   memoria: Memoria;
 }
@@ -16,9 +23,6 @@ interface Procesos {
   materiaSaliente: (index: number) => number;
   relacionar: (nodo: NodoInterface) => NodoInterface;
 }
-
-const filas = 50;
-const columnas = 80;
 
 const materiaEntrante = (nodo: NodoInterface, propiedad: number): number => {
   nodo.memoria.propiedades.push(propiedad);
@@ -43,11 +47,11 @@ const materiaSaliente = (index: number): number => {
 const nodos: NodoInterface[] = [];
 
 const determinacionesDelSistema = () => {
-  for (let i = 0; i < filas; i++) {
-    for (let j = 0; j < columnas; j++) {
+  for (let i = 0; i < ValoresSistema.FILAS; i++) {
+    for (let j = 0; j < ValoresSistema.COLUMNAS; j++) {
       const nodo: NodoInterface = {
         memoria: {
-          propiedades: [Math.random() > 0.5 ? 1 : 0], // Ajustar la probabilidad de vida inicial
+          propiedades: [Math.random() > ValoresSistema.PROBABILIDAD_VIDA_INICIAL ? 1 : 0],
           edad: 0,
           subMemoria: [],
           procesos: {
@@ -67,7 +71,7 @@ const determinacionesDelSistema = () => {
 const procesoDeAlimentacion = (nodo: NodoInterface, vecinosVivos: number) => {
   if (nodo.memoria.propiedades[0] === 1) {
     nodo.memoria.edad++;
-    if (vecinosVivos < 2 || vecinosVivos > 3 || nodo.memoria.edad > 10) {
+    if (vecinosVivos < 2 || vecinosVivos > 3 || nodo.memoria.edad > ValoresSistema.LIMITE_EDAD) {
       nodo.memoria.propiedades[0] = 0;
       nodo.memoria.edad = 0;
     }
@@ -81,24 +85,24 @@ const procesoDeAlimentacion = (nodo: NodoInterface, vecinosVivos: number) => {
 
 const vecinosVivos = (i: number, j: number) => {
   const vecinos = [
-    nodos[((i - 1 + filas) % filas) * columnas + ((j - 1 + columnas) % columnas)]?.memoria.propiedades[0] ?? 0,
-    nodos[((i - 1 + filas) % filas) * columnas + j]?.memoria.propiedades[0] ?? 0,
-    nodos[((i - 1 + filas) % filas) * columnas + ((j + 1) % columnas)]?.memoria.propiedades[0] ?? 0,
-    nodos[i * columnas + ((j - 1 + columnas) % columnas)]?.memoria.propiedades[0] ?? 0,
-    nodos[i * columnas + ((j + 1) % columnas)]?.memoria.propiedades[0] ?? 0,
-    nodos[((i + 1) % filas) * columnas + ((j - 1 + columnas) % columnas)]?.memoria.propiedades[0] ?? 0,
-    nodos[((i + 1) % filas) * columnas + (j)]?.memoria.propiedades[0] ?? 0,
-    nodos[((i + 1) % filas) * columnas + ((j + 1) % columnas)]?.memoria.propiedades[0] ?? 0,
+    nodos[((i - 1 + ValoresSistema.FILAS) % ValoresSistema.FILAS) * ValoresSistema.COLUMNAS + ((j - 1 + ValoresSistema.COLUMNAS) % ValoresSistema.COLUMNAS)]?.memoria.propiedades[0] ?? 0,
+    nodos[((i - 1 + ValoresSistema.FILAS) % ValoresSistema.FILAS) * ValoresSistema.COLUMNAS + j]?.memoria.propiedades[0] ?? 0,
+    nodos[((i - 1 + ValoresSistema.FILAS) % ValoresSistema.FILAS) * ValoresSistema.COLUMNAS + ((j + 1) % ValoresSistema.COLUMNAS)]?.memoria.propiedades[0] ?? 0,
+    nodos[i * ValoresSistema.COLUMNAS + ((j - 1 + ValoresSistema.COLUMNAS) % ValoresSistema.COLUMNAS)]?.memoria.propiedades[0] ?? 0,
+    nodos[i * ValoresSistema.COLUMNAS + ((j + 1) % ValoresSistema.COLUMNAS)]?.memoria.propiedades[0] ?? 0,
+    nodos[((i + 1) % ValoresSistema.FILAS) * ValoresSistema.COLUMNAS + ((j - 1 + ValoresSistema.COLUMNAS) % ValoresSistema.COLUMNAS)]?.memoria.propiedades[0] ?? 0,
+    nodos[((i + 1) % ValoresSistema.FILAS) * ValoresSistema.COLUMNAS + (j)]?.memoria.propiedades[0] ?? 0,
+    nodos[((i + 1) % ValoresSistema.FILAS) * ValoresSistema.COLUMNAS + ((j + 1) % ValoresSistema.COLUMNAS)]?.memoria.propiedades[0] ?? 0,
   ];
   return vecinos.reduce((a, b) => a + b);
 };
 
 const siguienteGeneracion = () => {
   const nuevaGeneracion: NodoInterface[] = nodos.map((nodo) => ({ ...nodo, memoria: { ...nodo.memoria, propiedades: [...nodo.memoria.propiedades] } }));
-  for (let i = 0; i < filas; i++) {
-    for (let j = 0; j < columnas; j++) {
+  for (let i = 0; i < ValoresSistema.FILAS; i++) {
+    for (let j = 0; j < ValoresSistema.COLUMNAS; j++) {
       const totalVecinosVivos = vecinosVivos(i, j);
-      procesoDeAlimentacion(nuevaGeneracion[i * columnas + j], totalVecinosVivos);
+      procesoDeAlimentacion(nuevaGeneracion[i * ValoresSistema.COLUMNAS + j], totalVecinosVivos);
     }
   }
   nodos.length = 0;
@@ -106,10 +110,10 @@ const siguienteGeneracion = () => {
 };
 
 const imprimirCuadricula = () => {
-  for (let i = 0; i < filas; i++) {
+  for (let i = 0; i < ValoresSistema.FILAS; i++) {
     let fila = '';
-    for (let j = 0; j < columnas; j++) {
-      const nodo = nodos[i * columnas + j];
+    for (let j = 0; j < ValoresSistema.COLUMNAS; j++) {
+      const nodo = nodos[i * ValoresSistema.COLUMNAS + j];
       if (nodo.memoria.propiedades[0] === 1) {
         if (nodo.memoria.edad < 2) {
           fila += '• '; // Célula joven
